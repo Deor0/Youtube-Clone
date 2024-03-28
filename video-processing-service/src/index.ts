@@ -1,10 +1,31 @@
-import express from 'express';
-const app = express();
-const port = 3000;
+import express from "express";
+import ffmpeg from "fluent-ffmpeg";
 
-app.get("/", (req, res) => {
-  res.send("Hello World");
+const app = express();
+app.use(express.json());
+
+app.post("/process-video", (req, res) => {
+  const inputFilePath = req.body.inputFilePath;
+  const outputFilePath = req.body.outputFilePath;
+
+  if (!inputFilePath || !outputFilePath) {
+    res.status(400).send("Bad Request missing file path. ");
+  }
+
+  ffmpeg(inputFilePath)
+    .outputOptions("-vf", "scale=-1:360") // 360p
+    .on("end", () => {
+      console.log("Processing finished successfully");
+      res.status(200).send("Processing finished successfully");
+    })
+    .on("error", (err) => {
+      console.log("An error occurred: " + err.message);
+      res.status(500).send("An error occurred: " + err.message);
+    })
+    .save(outputFilePath);
 });
+
+const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
