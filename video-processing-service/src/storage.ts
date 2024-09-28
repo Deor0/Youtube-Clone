@@ -1,5 +1,4 @@
 import { Storage } from "@google-cloud/storage";
-import { dir } from "console";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 
